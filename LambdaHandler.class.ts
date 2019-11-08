@@ -1,20 +1,12 @@
 import { Context, Callback } from 'aws-lambda'
 import { DynamoDB, Lambda, SES } from 'aws-sdk'
-import { IStandardReturn } from '../../interfaces/StandardReturn.interface'
-
-
-  export interface IRequest { }
-
-
-  export interface IResponse extends IStandardReturn {
-    thirdParty: { }
-  }
+import { Response, IResponse } from './Response.class'
 
 
 export abstract class LambdaHandler {
 
+    protected request:any
     protected response:IResponse
-    protected request:IRequest
     protected context:Context
     protected callback:Callback
     protected requiredInputs:string[]
@@ -28,12 +20,11 @@ export abstract class LambdaHandler {
     private awsAccessCredentials:{ accessKeyId:string|undefined, secretAccessKey:string|undefined, region:string|undefined }
 
 
-    constructor(request:IRequest, context:Context, callback:Callback) {
-      console.log('REQUEST:', request)
+    constructor(request:any, context:Context, callback:Callback) {
       this.response = new Response()
       this.bootstrap(request, context, callback)
       this.hookConstructorPre()
-      this.validateInputsExist()
+      this.validateRequiredInputsExist()
       this.validateInputValues()
       if (this.needsToConnectToDatabase) this.connectToDatabase()
       if (this.needsToExecuteLambdas) this.initializeLambda()
@@ -77,7 +68,8 @@ export abstract class LambdaHandler {
 
 
                 private parseRequestBody(request) {
-                  this.request = JSON.parse(request.body).params
+                  try { this.request = JSON.parse(request.body).params }
+                    catch (error) { /* Do nothing in abstract class, not always a deal breaker.  Overwrite method in inherited classes. */ }
                 }
 
 
@@ -113,7 +105,7 @@ export abstract class LambdaHandler {
 
 
 
-        private validateInputsExist() {
+        private validateRequiredInputsExist() {
           this.requiredInputs.forEach(requiredInput => {
               if (!this.request[requiredInput]) this.error.missingRequiredProperty(requiredInput)
             })
@@ -165,18 +157,18 @@ export abstract class LambdaHandler {
 
 
 
-        protected hasSucceeded(result) {
+        protected hasSucceeded(result?:any) {
           this.response.success = true
-          this.response.details = result
+          if (result) this.response.details = result
           this.sendResponse()
         }
 
 
 
 
-        protected hasFailed(error) {
+        protected hasFailed(error?:any) {
           this.response.success = false
-          this.response.details = error
+          if (error) this.response.details = error
           this.sendResponse()
         }
 
@@ -223,11 +215,3 @@ export class LambdaErrorHandler {
   protected respond(msg:string, error?:any) { if (error) console.log(`Error: ${ msg }`, error); this.callback(new Error(msg)) }
 
 } // End ErrorHandler Class -------
-
-
-
-export class Response implements IResponse {
-  success:boolean
-  details:any = { }
-  thirdParty:any = { }
-}
