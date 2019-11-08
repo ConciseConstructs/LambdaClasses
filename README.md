@@ -9,9 +9,9 @@ Pre-Processing:
 
 Example (In child class):
 
-  hookConstructorPre() {
+  "hookConstructorPre() {
     this.needsToConnectToDatabase = true
-  }
+  }"
 
 
 2.) The "requiredInputs:string[]" property can be set and the abstract class will loop through all the parameters passed into the function and make sure that property exists before proceeding.  Simply push the property name into this array of strings.
