@@ -39,7 +39,7 @@ export abstract class LambdaHandler {
 
 
 
-        private bootstrap(request, context, callback) {
+        protected bootstrap(request, context, callback) {
           if (request.httpMethod) this.parseRequest(request)
           else this.request = request
           this.makeAWSCredentials()
@@ -52,7 +52,7 @@ export abstract class LambdaHandler {
 
 
 
-            private parseRequest(request) {
+            protected parseRequest(request) {
               if (this.needsToParseBody(request)) this.parseRequestBody(request)
               else if (this.needsToParseQuery(request)) this.parseRequestQuery(request)
             }
@@ -60,14 +60,14 @@ export abstract class LambdaHandler {
 
 
 
-                private needsToParseBody(request) {
+                protected needsToParseBody(request) {
                   return (request.httpMethod === 'POST' || request.httpMethod === 'PUT')
                 }
 
 
 
 
-                private parseRequestBody(request) {
+                protected parseRequestBody(request) {
                   try { this.request = JSON.parse(request.body).params }
                     catch (error) { /* Do nothing in abstract class, not always a deal breaker.  Overwrite method in inherited classes. */ }
                 }
@@ -75,21 +75,21 @@ export abstract class LambdaHandler {
 
 
 
-                private needsToParseQuery(request) {
+                protected needsToParseQuery(request) {
                   return (request.httpMethod === 'GET' || request.httpMethod === 'DELETE')
                 }
 
 
 
 
-                private parseRequestQuery(request) {
+                protected parseRequestQuery(request) {
                   this.request = request.queryStringParameters
                 }
 
 
 
 
-            private makeAWSCredentials() {
+            protected makeAWSCredentials() {
               this.awsAccessCredentials = {
                 accessKeyId: process.env.accessKeyId,
                 secretAccessKey: process.env.secretAccessKey,
@@ -105,7 +105,7 @@ export abstract class LambdaHandler {
 
 
 
-        private validateRequiredInputsExist() {
+        protected validateRequiredInputsExist() {
           this.requiredInputs.forEach(requiredInput => {
               if (!this.request[requiredInput]) this.error.missingRequiredProperty(requiredInput)
             })
