@@ -134,7 +134,8 @@ export abstract class LambdaHandler {
 
 
         protected initializeSimpleEmailService() {
-          this.emailService = new SES(this.awsAccessCredentials)
+          let SESParams = { accessKeyId: this.awsAccessCredentials.accessKeyId, secretAccessKey: this.awsAccessCredentials.secretAccessKey,  region: 'us-east-1' }
+          this.emailService = new SES(SESParams)
         }
 
 
