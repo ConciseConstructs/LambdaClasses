@@ -1,12 +1,12 @@
 import { Context, Callback } from 'aws-lambda'
 import { DynamoDB, Lambda, SES } from 'aws-sdk'
-import { Response, IResponse } from './Response.class'
+import { Response, TApiResponse } from './Response.class'
 
 
 export abstract class LambdaHandler {
 
     protected request:any
-    protected response:IResponse
+    protected response:TApiResponse
     protected context:Context
     protected callback:Callback
     protected requiredInputs:string[]
@@ -21,7 +21,6 @@ export abstract class LambdaHandler {
 
 
     constructor(request:any, context:Context, callback:Callback) {
-      this.response = new Response()
       this.bootstrap(request, context, callback)
       this.hookConstructorPre()
       this.validateRequiredInputsExist()
@@ -40,6 +39,8 @@ export abstract class LambdaHandler {
 
 
         protected bootstrap(request, context, callback) {
+          this.response = new Response()
+          this.response.input = request
           if (request.httpMethod) this.parseRequest(request)
           else this.request = request
           this.makeAWSCredentials()
@@ -160,7 +161,7 @@ export abstract class LambdaHandler {
 
         protected hasSucceeded(result?:any) {
           this.response.success = true
-          if (result) this.response.details = result
+          if (result) this.response.output = result
           this.sendResponse()
         }
 
@@ -169,7 +170,7 @@ export abstract class LambdaHandler {
 
         protected hasFailed(error?:any) {
           this.response.success = false
-          if (error) this.response.details = error
+          if (error) this.response.output = error
           this.sendResponse()
         }
 
@@ -177,7 +178,7 @@ export abstract class LambdaHandler {
 
 
     protected sendResponse() {
-      let output = {
+      let reply = {
         statusCode: 200,
         headers: {
           'Access-Control-Allow-Origin': '*',
@@ -186,7 +187,7 @@ export abstract class LambdaHandler {
         },
         body: JSON.stringify(this.response)
       }
-      this.callback(null, output)
+      this.callback(null, reply)
     }
 
 }

@@ -1,11 +1,13 @@
-export interface IResponse {
+export interface TApiResponse {
   success:boolean
-  details:any
-  thirdParty:any
+  input:any
+  output:any
+  thirdParty?:any
 }
 
-export class Response implements IResponse {
+export class Response implements TApiResponse {
   success:boolean
-  details:any = { }
+  input:any = null
+  output:any = { }
   thirdParty:any = { }
 }
