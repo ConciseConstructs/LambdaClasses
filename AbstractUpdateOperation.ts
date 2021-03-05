@@ -36,7 +36,7 @@ export abstract class UpdateHandler extends LambdaHandler {
       this.unlinkOldRecords()
       this.linkNewRecords()
       this.db.put(this.makePutSyntax()).promise()
-        .then(result => this.hasSucceeded(result))
+        .then(result => this.hasSucceeded(this.request.item))
         .catch(error => this.hasFailed(error))
     }
 
