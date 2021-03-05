@@ -46,7 +46,7 @@ export abstract class UpdateHandler extends LambdaHandler {
         private unlinkOldRecords() {
           if (!this.request.item.links._unlink) return
           for (let [ table, ids ] of Object.entries(this.request.item.links._unlink as any)) {
-            Object.keys(ids).forEach(id => this.unlink({ table: table, id: id }))
+            Object.keys(<any>ids).forEach(id => this.unlink({ table: table, id: id }))
           }
           delete this.request.item.links._unlink
         }
@@ -82,7 +82,7 @@ export abstract class UpdateHandler extends LambdaHandler {
         private linkNewRecords() {
           if (!this.request.item.links._link) return
           for (let [ table, ids ] of Object.entries(this.request.item.links._link as any)) {
-            Object.keys(ids).forEach(id => this.link({ table: table, id: id }))
+            Object.keys(<any>ids).forEach(id => this.link({ table: table, id: id }))
           }
           delete this.request.item.links._link
         }
