@@ -1,7 +1,7 @@
 import { LambdaHandler } from './AbstractLambdaHandler.class'
 import { TApiResponse } from './Response.class'
 import { Context, Callback } from 'aws-lambda'
-import { IReadRequest } from '../../interfaces/ICRUD/IReadRequest.interface'
+import { TApiReadRequest } from './AbstractReadOperation'
 
 
 
@@ -58,7 +58,7 @@ export abstract class DeleteHandler extends LambdaHandler {
               accountId: this.request.accountId,
               condition: 'isExactly',
               value: this.request.id
-            } as IReadRequest)
+            } as TApiReadRequest)
           }).promise()
             .then(result => this.onGetRecordSuccess(result))
             .catch(error => this.onGetRecordFailure(error))

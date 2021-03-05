@@ -1,5 +1,5 @@
 import { LambdaHandler } from './AbstractLambdaHandler.class'
-import { TApiResponse } from '../lambdahandler/Response.class'
+import { TApiResponse } from './Response.class'
 import { Context, Callback } from 'aws-lambda'
 
 
